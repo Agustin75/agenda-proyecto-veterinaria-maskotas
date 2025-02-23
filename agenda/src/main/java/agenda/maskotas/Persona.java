@@ -49,4 +49,20 @@ public class Persona {
     public void setTelefono(int telefono) {
         this.telefono = telefono;
     }
+
+    /*
+     * Métodos
+     */
+    public String obtenerInformacion() {
+        String s = "";
+
+        s += "Nombre: " + getNombre();
+        s += " - Apellidos: " + getApellidos();
+        s += " - Dirección: " + getDireccion();
+        s += " - Email: " + getEmail();
+        s += " - Teléfono: " + getTelefono();
+        s += " - Observaciones: " + getObservaciones();
+
+        return s;
+    }
 }
