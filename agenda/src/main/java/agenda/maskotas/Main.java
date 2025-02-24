@@ -43,13 +43,23 @@ public class Main {
         return n;
     }
 
+    public static boolean confirmarSeleccion(String mensajeConfirmacion) {
+        String confirmacion = "";
+
+        while (!"S".equals(confirmacion) && !"N".equals(confirmacion)) {
+            confirmacion = pedirString(mensajeConfirmacion, false);
+        }
+
+        return confirmacion.equals("S");
+    }
+
     public static void main(String[] args) {
         enum PERSONAS {
             CLIENTE, EMPLEADO, PROVEEDOR
         }
 
         boolean running = true, seleccionandoTabla = true, modificandoTabla = false;
-        int opcion, tablaElegida = -1, registroElegido;
+        int opcion = -1, tablaElegida = -1, registroElegido;
         ArrayList<ArrayList<Persona>> personas = new ArrayList<>();
         // Datos de persona
         String nombre, apellidos, direccion, email, observaciones;
@@ -76,7 +86,9 @@ public class Main {
                 System.out.println("2) Empleado");
                 System.out.println("3) Proveedor");
                 System.out.println("4) Volver atrás");
+                while (opcion < 1 || opcion > 4) {
                 opcion = pedirInt("¿Qué tabla desea modificar? (1-4): ");
+                }
 
                 if (opcion == 4) {
                     seleccionandoTabla = false;
@@ -102,6 +114,11 @@ public class Main {
 
                     switch (opcion) {
                         case 1 -> {
+                            if (personas.get(tablaElegida).isEmpty()) {
+                                System.out.println("No hay ningún registro en esta tabla.");
+                                break;
+                            }
+
                             for (Persona persona : personas.get(tablaElegida)) {
                                 System.out.println("1) " + persona.obtenerInformacion());
                             }
@@ -202,13 +219,10 @@ public class Main {
                         case 4 -> {
                             opcion = pedirInt("¿Qué registro desea borrar? (0 para cancelar): ") - 1;
                             if (opcion != -1 && opcion >= 0 && opcion < personas.get(tablaElegida).size()) {
-                                String confirmacion = "";
-                                while (!"Y".equals(confirmacion) && !"N".equals(confirmacion)) {
-                                    confirmacion = pedirString("¿Está seguro que desea eliminar el registro \""
+                                String mensajeConfirmacion = "¿Está seguro que desea eliminar el registro \""
                                             + personas.get(tablaElegida).get(opcion).obtenerInformacion()
-                                            + "\"? (Y/N): ", false);
-                                }
-                                if (confirmacion.equals("Y")) {
+                                            + "\"? (S/N): ";
+                                if (confirmarSeleccion(mensajeConfirmacion)) {
                                     personas.get(tablaElegida).remove(opcion);
                                 }
                             }
