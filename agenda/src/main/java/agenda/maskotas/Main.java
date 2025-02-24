@@ -23,11 +23,22 @@ public class Main {
     }
 
     public static int pedirInt(String solicitud) {
+        int n = -1;
+        boolean validInput = false;
+
+        do {
         System.out.print(solicitud);
 
-        // TODO: Add exception catching
-        int n = scanner.nextInt();
+            try {
+                n = scanner.nextInt();
+
+                validInput = true;
+            } catch (Exception e) {
+                System.err.println("No se ingreso un valor correcto. Por favor, intente de nuevo.");
+            } finally {
         scanner.nextLine();
+            }
+        } while (!validInput);
 
         return n;
     }
