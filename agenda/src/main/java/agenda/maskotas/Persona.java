@@ -6,6 +6,16 @@ public class Persona {
     private String nombre, apellidos, direccion, email, observaciones;
     private int telefono;
 
+    public Persona(int id, String nombre, String apellidos, String direccion, String email, int telefono, String observaciones) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellidos = apellidos;
+        this.direccion = direccion;
+        this.email = email;
+        this.telefono = telefono;
+        this.observaciones = observaciones;
+    }
+
     public Persona(String nombre, String apellidos, String direccion, String email, int telefono, String observaciones) {
         id = nextID++;
         this.nombre = nombre;
@@ -53,6 +63,10 @@ public class Persona {
         this.telefono = telefono;
     }
 
+    public static int getNextID() {
+        return nextID;
+    }
+
     /*
      * Métodos
      */
@@ -67,5 +81,9 @@ public class Persona {
         s += " - Observaciones: " + getObservaciones();
 
         return s;
+    }
+
+    public int getId() {
+        return id;
     }
 }
