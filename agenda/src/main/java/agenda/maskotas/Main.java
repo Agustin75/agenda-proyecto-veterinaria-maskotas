@@ -27,7 +27,7 @@ public class Main {
         boolean validInput = false;
 
         do {
-        System.out.print(solicitud);
+            System.out.print(solicitud);
 
             try {
                 n = scanner.nextInt();
@@ -36,7 +36,7 @@ public class Main {
             } catch (Exception e) {
                 System.err.println("No se ingreso un valor correcto. Por favor, intente de nuevo.");
             } finally {
-        scanner.nextLine();
+                scanner.nextLine();
             }
         } while (!validInput);
 
@@ -72,6 +72,7 @@ public class Main {
             // TODO: Ask for a path to the database to load
             // TODO: Change so it opens a window to select the file to load instead
             // TODO: Load the lists from file here
+            
             personas.add(new ArrayList<>());
             personas.add(new ArrayList<>());
             personas.add(new ArrayList<>());
@@ -87,7 +88,7 @@ public class Main {
                 System.out.println("3) Proveedor");
                 System.out.println("4) Volver atrás");
                 while (opcion < 1 || opcion > 4) {
-                opcion = pedirInt("¿Qué tabla desea modificar? (1-4): ");
+                    opcion = pedirInt("¿Qué tabla desea modificar? (1-4): ");
                 }
 
                 if (opcion == 4) {
@@ -171,8 +172,22 @@ public class Main {
                                 System.out.println("1) " + persona.obtenerInformacion());
                             }
 
-                            registroElegido = pedirInt("Selecciona el registro a modificar (1-" + personas.get(tablaElegida).size() + "): ") - 1;
+                            registroElegido = switch (personas.get(tablaElegida).size()) {
+                                case 1 ->
+                                    0;
+                                default ->
+                                    pedirInt("Selecciona el registro a modificar (1-" + personas.get(tablaElegida).size() + "): ") - 1;
+                            };
                             boolean done = false;
+                            byte camposEditados = 0;
+
+                            Persona personaElegida = personas.get(tablaElegida).get(registroElegido);
+                            nombre = personaElegida.getNombre();
+                            apellidos = personaElegida.getApellidos();
+                            direccion = personaElegida.getDireccion();
+                            email = personaElegida.getEmail();
+                            telefono = personaElegida.getTelefono();
+                            observaciones = personaElegida.getObservaciones();
 
                             while (!done) {
                                 System.out.println("Campos:");
@@ -182,35 +197,102 @@ public class Main {
                                 System.out.println("4) Email");
                                 System.out.println("5) Teléfono");
                                 System.out.println("6) Observaciones");
-                                System.out.println("7) Cancelar");
+                                System.out.println("7) Guardar y volver atrás");
+                                System.out.println("8) Cancelar y volver atrás");
                                 opcion = pedirInt("¿Qué campo desea modificar? (1-7): ");
 
                                 switch (opcion) {
                                     case 1 -> {
                                         nombre = pedirString("Nombre: ", false);
-                                        personas.get(tablaElegida).get(registroElegido).setNombre(nombre);
+                                        if (!nombre.equals(personaElegida.getNombre())) {
+                                            camposEditados |= 1;
+                                        }
                                     }
                                     case 2 -> {
                                         apellidos = pedirString("Apellidos: ", false);
-                                        personas.get(tablaElegida).get(registroElegido).setApellidos(apellidos);
+                                        if (!apellidos.equals(personaElegida.getApellidos())) {
+                                            camposEditados |= (1 << 1);
+                                        }
                                     }
                                     case 3 -> {
                                         direccion = pedirString("Dirección: ", false);
-                                        personas.get(tablaElegida).get(registroElegido).setDireccion(direccion);
+                                        if (!direccion.equals(personaElegida.getDireccion())) {
+                                            camposEditados |= (1 << 2);
+                                        }
                                     }
                                     case 4 -> {
                                         email = pedirString("Correo electrónico: ", false);
-                                        personas.get(tablaElegida).get(registroElegido).setEmail(email);
+                                        if (!email.equals(personaElegida.getEmail())) {
+                                            camposEditados |= (1 << 3);
+                                        }
                                     }
                                     case 5 -> {
                                         telefono = pedirInt("Número de teléfono: ");
-                                        personas.get(tablaElegida).get(registroElegido).setTelefono(telefono);
+                                        if (telefono != personaElegida.getTelefono()) {
+                                            camposEditados |= (1 << 4);
+                                        }
                                     }
                                     case 6 -> {
                                         observaciones = pedirString("Observación: ", true);
-                                        personas.get(tablaElegida).get(registroElegido).setObservaciones(observaciones);
+                                        if (!observaciones.equals(personaElegida.getObservaciones())) {
+                                            camposEditados |= (1 << 5);
+                                        }
                                     }
-                                    case 7 -> done = true;
+                                    case 7 -> {
+                                        if (camposEditados != 0) {
+                                            String mensajeConfirmacion = "¿Está seguro que desea sobreescribir los campos editados? (S/N): ";
+
+                                            String s = "Campos Editados:";
+
+                                            s += "Nombre: " + personaElegida.getNombre();
+                                            if ((camposEditados & 1) != 0) {
+                                                s += " -> " + nombre;
+                                            }
+
+                                            s += "\nApellidos: " + personaElegida.getApellidos();
+                                            if ((camposEditados & (1 << 1)) != 0) {
+                                                s += " -> " + apellidos;
+                                            }
+
+                                            s += "\nDirección: " + personaElegida.getDireccion();
+                                            if ((camposEditados & (1 << 2)) != 0) {
+                                                s += " -> " + direccion + "\n";
+                                            }
+                                            
+                                            s += "\nEmail: " + personaElegida.getEmail();
+                                            if ((camposEditados & (1 << 3)) != 0) {
+                                                s += " -> " + email + "\n";
+                                            }
+
+                                            s +=  "\nTeléfono: " + personaElegida.getTelefono();
+                                            if ((camposEditados & (1 << 4)) != 0) {
+                                                s += " -> " + telefono + "\n";
+                                            }
+                                            
+                                            s +=  "\nObservaciones: " + (personaElegida.getObservaciones().equals("") ? "N/A" : personaElegida.getObservaciones());
+                                            if ((camposEditados & (1 << 5)) != 0) {
+                                                s +=  " -> " + (observaciones.equals("") ? "N/A" : observaciones) + "\n";
+                                            }
+
+                                            s += "\n";
+
+                                            if (confirmarSeleccion(s + mensajeConfirmacion)) {
+                                                personaElegida.setNombre(nombre);
+                                                personaElegida.setApellidos(apellidos);
+                                                personaElegida.setDireccion(direccion);
+                                                personaElegida.setEmail(email);
+                                                personaElegida.setTelefono(telefono);
+                                                personaElegida.setObservaciones(observaciones);
+                                            }
+                                            else {
+                                                break;
+                                            }
+                                        }
+
+                                        done = true;
+                                    }
+                                    case 8 ->
+                                        done = true;
                                     default -> {
                                     }
                                 }
