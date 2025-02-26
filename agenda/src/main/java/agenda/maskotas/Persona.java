@@ -1,10 +1,13 @@
 package agenda.maskotas;
 
 public class Persona {
+    private static int nextID = 1;
+    private final int id;
     private String nombre, apellidos, direccion, email, observaciones;
     private int telefono;
 
     public Persona(String nombre, String apellidos, String direccion, String email, int telefono, String observaciones) {
+        id = nextID++;
         this.nombre = nombre;
         this.apellidos = apellidos;
         this.direccion = direccion;

@@ -291,8 +291,49 @@ public class Main {
 
                                         done = true;
                                     }
-                                    case 8 ->
-                                        done = true;
+                                    case 8 -> {
+                                        if (camposEditados != 0) {
+                                            String mensajeConfirmacion = "¿Está seguro que desea descartar los cambios realizados? (S/N): ";
+
+                                            String s = "Campos Editados:";
+
+                                            s += "Nombre: " + personaElegida.getNombre();
+                                            if ((camposEditados & 1) != 0) {
+                                                s += " -> " + nombre;
+                                            }
+
+                                            s += "\nApellidos: " + personaElegida.getApellidos();
+                                            if ((camposEditados & (1 << 1)) != 0) {
+                                                s += " -> " + apellidos;
+                                            }
+
+                                            s += "\nDirección: " + personaElegida.getDireccion();
+                                            if ((camposEditados & (1 << 2)) != 0) {
+                                                s += " -> " + direccion + "\n";
+                                            }
+                                            
+                                            s += "\nEmail: " + personaElegida.getEmail();
+                                            if ((camposEditados & (1 << 3)) != 0) {
+                                                s += " -> " + email + "\n";
+                                            }
+
+                                            s +=  "\nTeléfono: " + personaElegida.getTelefono();
+                                            if ((camposEditados & (1 << 4)) != 0) {
+                                                s += " -> " + telefono + "\n";
+                                            }
+                                            
+                                            s +=  "\nObservaciones: " + (personaElegida.getObservaciones().equals("") ? "N/A" : personaElegida.getObservaciones());
+                                            if ((camposEditados & (1 << 5)) != 0) {
+                                                s +=  " -> " + (observaciones.equals("") ? "N/A" : observaciones) + "\n";
+                                            }
+
+                                            s += "\n";
+
+                                            if (confirmarSeleccion(s + mensajeConfirmacion)) {
+                                                done = true;
+                                            }
+                                        }
+                                    }
                                     default -> {
                                     }
                                 }
