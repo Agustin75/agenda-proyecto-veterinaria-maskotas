@@ -1,6 +1,7 @@
 package agenda.maskotas;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,7 +38,7 @@ public class MainProgram {
         return s;
     }
 
-    public File pedirRuta(String solicitud, boolean emptyStringValid) {
+    public File pedirRuta(String solicitud, boolean emptyStringValid, boolean rutaDebeExistir) {
         String s;
         File f = null;
         boolean rutaValida = false;
@@ -55,9 +56,8 @@ public class MainProgram {
             try {
                 f = new File(s);
 
-                rutaValida = true;
+                rutaValida = (rutaDebeExistir ? f.exists() : true);
             } catch (Exception e) {
-                // TODO: Cambiar para que permita una ruta que no existe cuando se guarda la información
                 System.err.println("La ruta ingresada no es correcta. Por favor, intente de nuevo.");
             }
         }
@@ -143,16 +143,75 @@ public class MainProgram {
 
             // TODO: Add visuals for a good menu
 
-            File f = pedirRuta("Ingrese la ruta de la agena a cargar (Deje el campo vacío para crear una nueva): ", true);
-
-            // No se ingreso una ruta, crear una nueva Agenda
-            if (f == null) {
-                
-            }
-
-            // TODO: Ask for a path to the database to load
             // TODO: Change so it opens a window to select the file to load instead
-            // TODO: Load the lists from file here
+            File f = pedirRuta("Ingrese la ruta de la agena a cargar (Deje el campo vacío para crear una nueva): ", true, true);
+
+            if (f != null) {
+                try (Scanner fileScanner = new Scanner(f)) {
+                    int nextId = fileScanner.nextInt();
+
+                    Persona.setNextID(nextId);
+                    fileScanner.nextLine();
+
+                    String line;
+                    int tabla = -1;
+                    int idPersona;
+                    while (fileScanner.hasNext()) {
+                        line = fileScanner.nextLine();
+
+                        try {
+                            if (null != PERSONAS.valueOf(line)) {
+                                switch (PERSONAS.valueOf(line)) {
+                                    case CLIENTE -> {
+                                        tabla = 0;
+                                        continue;
+                                    }
+                                    case EMPLEADO -> {
+                                        tabla = 1;
+                                        continue;
+                                    }
+                                    case PROVEEDOR -> {
+                                        tabla = 2;
+                                        continue;
+                                    }
+                                    default -> {
+                                    }
+                                }
+                            }
+                        } catch (IllegalArgumentException e) {
+                            // El string leído no es parte del enum, leer la línea de datos
+                        }
+
+                        if (tabla == -1) {
+                            System.err.println("ERROR: El archivo no se puede leer ya que el formato no es correcto.");
+                        } else {
+                            String[] campos = line.split(",");
+                            try {
+                                idPersona = Integer.parseInt(campos[0]);
+                                nombre = campos[1];
+                                apellidos = campos[2];
+                                direccion = campos[3];
+                                email = campos[4];
+                                telefono = Integer.parseInt(campos[5]);
+
+                                if (campos.length == 6) {
+                                    personas.get(tabla).add(new Persona(idPersona, nombre, apellidos, direccion, email, telefono, ""));
+
+                                } else if (campos.length == 7) {
+                                    observaciones = campos[6];
+                                    personas.get(tabla).add(new Persona(idPersona, nombre, apellidos, direccion, email, telefono, observaciones));
+                                }
+                            } catch (NumberFormatException e) {
+                                System.err.println("Error en la línea \"" + line + "\" al intentar convertir un valor a número entero.");
+                            }
+                        }
+                    }
+
+                } catch (FileNotFoundException e) {
+                    System.err.println("ERROR: La ruta especificada no es válida.");
+                    return;
+                }
+            }
 
             /**
              * *******************************
@@ -165,7 +224,7 @@ public class MainProgram {
 
             // Se creó una nueva Agenda, pedir la ruta completa dónde guardar el archivo (nombre y extensión incluidos)
             if (f == null) {
-                f = pedirRuta("Ingrese la ruta donde guardar la información: ", false);
+                f = pedirRuta("Ingrese la ruta donde guardar la información: ", false, false);
                 try {
                     try (FileWriter fw = new FileWriter(f)) {
                         fw.append(Persona.getNextID() + "\n");
@@ -175,7 +234,7 @@ public class MainProgram {
                             fw.append(PERSONAS.values()[i].toString() + "\n");
 
                             for (Persona persona : personas.get(i)) {
-                                fw.append(String.format("%s,%s,%s,%s,%s,%s,%s\n", persona.getId(), persona.getNombre(), persona.getApellidos(), persona.getDireccion(), persona.getEmail(), persona.getTelefono(),persona.getObservaciones()));
+                                fw.append(String.format("%s,%s,%s,%s,%s,%s,%s\n", persona.getId(), persona.getNombre(), persona.getApellidos(), persona.getDireccion(), persona.getEmail(), persona.getTelefono(), persona.getObservaciones()));
                             }
                         }
                     }

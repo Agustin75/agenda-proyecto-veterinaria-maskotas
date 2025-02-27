@@ -66,6 +66,9 @@ public class Persona {
     public static int getNextID() {
         return nextID;
     }
+    public static void setNextID(int id) {
+        nextID = id;
+    }
 
     /*
      * Métodos
