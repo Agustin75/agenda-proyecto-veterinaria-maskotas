@@ -18,6 +18,8 @@ public class MainProgram {
     boolean running = true, seleccionandoTabla = true, modificandoTabla = false;
     int opcion = -1, tablaElegida = -1, registroElegido;
     ArrayList<ArrayList<Persona>> personas = new ArrayList<>();
+    String rutaCargada = "";
+
     // Datos de persona
     String nombre, apellidos, direccion, email, observaciones;
     int telefono;
@@ -142,9 +144,20 @@ public class MainProgram {
             personas.add(new ArrayList<>());
 
             // TODO: Add visuals for a good menu
-
             // TODO: Change so it opens a window to select the file to load instead
-            File f = pedirRuta("Ingrese la ruta de la agena a cargar (Deje el campo vacío para crear una nueva): ", true, true);
+            File f;
+            do {
+                f = pedirRuta("Ingrese la ruta de la agenda a cargar (Deje el campo vacío para crear una nueva): ", true, true);
+
+                if (f == null) {
+                    break;
+                } else if (f.isFile()) {
+                    rutaCargada = f.getPath();
+                    break;
+                } else {
+                    System.out.println("Por favor, ingrese la ruta a un archivo.");
+                }
+            } while (true);
 
             if (f != null) {
                 try (Scanner fileScanner = new Scanner(f)) {
@@ -222,9 +235,12 @@ public class MainProgram {
                 menuTablas();
             }
 
+            if (confirmarSeleccion("¿Desea guardar los cambios realizados? (S/N): ")) {
+                if (rutaCargada.isEmpty() || confirmarSeleccion("¿Desea guardar la base de datos en un archivo nuevo? (S/N): ")) {
             // Se creó una nueva Agenda, pedir la ruta completa dónde guardar el archivo (nombre y extensión incluidos)
-            if (f == null) {
                 f = pedirRuta("Ingrese la ruta donde guardar la información: ", false, false);
+                }
+    
                 try {
                     try (FileWriter fw = new FileWriter(f)) {
                         fw.append(Persona.getNextID() + "\n");
