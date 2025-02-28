@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-// TODO: Add code to account for chosing "Borrar registro" when no field exists
 public class MainProgram {
     private final Scanner scanner = new Scanner(System.in);
 
@@ -351,6 +350,11 @@ public class MainProgram {
                 menuModificacionRegistro();
             }
             case 4 -> {
+                if (personas.get(tablaElegida).isEmpty()) {
+                    System.out.println("No hay ningún registro en esta tabla.");
+                    break;
+                }
+
                 opcion = pedirInt("¿Qué registro desea borrar? (0 para cancelar): ") - 1;
                 if (opcion != -1 && opcion >= 0 && opcion < personas.get(tablaElegida).size()) {
                     String mensajeConfirmacion = "¿Está seguro que desea eliminar el registro \""
