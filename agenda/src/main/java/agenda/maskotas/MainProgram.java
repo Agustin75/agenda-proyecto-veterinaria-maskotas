@@ -18,14 +18,48 @@ public class MainProgram {
     int opcion = -1, tablaElegida = -1, registroElegido;
     ArrayList<ArrayList<Persona>> personas = new ArrayList<>();
     String rutaCargada = "";
+    ArrayList<String> menuTablas = new ArrayList<>();
+    ArrayList<String> menuModificacionTablas = new ArrayList<>();
+    ArrayList<String> menuModificacionRegistro = new ArrayList<>();
 
     // Datos de persona
     String nombre, apellidos, direccion, email, observaciones;
     int telefono;
 
 //#region Helper Funcions
-    public void mostrarMenu() {
-        // TODO: Code to display a good-looking menu
+    public void mostrarMenu(ArrayList<String> opciones) {
+        if (opciones.isEmpty()) {
+            return;
+        }
+
+        // Tamaño mínimo del menú, arbitrario
+        int size = 35;
+        String barraMenu = "";
+
+        // Hacer el menú tan grande como la opción más larga, más el padding ("|| " al principio y " ||" al final)
+        for (String currOpcion : opciones) {
+            if (currOpcion.length() + 6 > size) {
+                size = currOpcion.length() + 6;
+            }
+        }
+
+        for (int i = 0; i < size; i++) {
+            barraMenu += "=";
+        }
+
+        System.out.println(barraMenu);
+
+        for (String currOpcion : opciones) {
+            System.out.print("|| " + currOpcion + " ");
+
+            for (int i = currOpcion.length() + 4; i < size - 2; i++) {
+                System.out.print(" ");
+            }
+
+            System.out.println("||");
+        }
+
+        System.out.println(barraMenu);
     }
 
     public String pedirString(String solicitud, boolean emptyStringValid) {
@@ -97,52 +131,80 @@ public class MainProgram {
         return confirmacion.equals("S");
     }
 
-    public String getStringCamposEditados(Persona personaElegida, byte camposEditados) {
-        String s = "Campos Editados:";
+    public ArrayList<String> getMenuCamposEditados(Persona personaElegida, byte camposEditados) {
+        ArrayList<String> menu = new ArrayList<>();
+        String s;
 
-        s += "Nombre: " + personaElegida.getNombre();
+        menu.add("Campos Editados:");
+
+        s = "Nombre: " + personaElegida.getNombre();
         if ((camposEditados & 1) != 0) {
             s += " -> " + nombre;
         }
+        menu.add(s);
 
-        s += "\nApellidos: " + personaElegida.getApellidos();
+        s = "Apellidos: " + personaElegida.getApellidos();
         if ((camposEditados & (1 << 1)) != 0) {
             s += " -> " + apellidos;
         }
+        menu.add(s);
 
-        s += "\nDirección: " + personaElegida.getDireccion();
+        s = "Dirección: " + personaElegida.getDireccion();
         if ((camposEditados & (1 << 2)) != 0) {
             s += " -> " + direccion;
         }
+        menu.add(s);
 
-        s += "\nEmail: " + personaElegida.getEmail();
+        s = "Email: " + personaElegida.getEmail();
         if ((camposEditados & (1 << 3)) != 0) {
             s += " -> " + email;
         }
+        menu.add(s);
 
-        s += "\nTeléfono: " + personaElegida.getTelefono();
+        s = "Teléfono: " + personaElegida.getTelefono();
         if ((camposEditados & (1 << 4)) != 0) {
             s += " -> " + telefono;
         }
+        menu.add(s);
 
-        s += "\nObservaciones: " + (personaElegida.getObservaciones().equals("") ? "N/A" : personaElegida.getObservaciones());
+        s = "Observaciones: " + (personaElegida.getObservaciones().equals("") ? "N/A" : personaElegida.getObservaciones());
         if ((camposEditados & (1 << 5)) != 0) {
             s += " -> " + (observaciones.equals("") ? "N/A" : observaciones);
         }
+        menu.add(s);
 
-        s += "\n";
-
-        return s;
+        return menu;
     }
 //#endregion
 
     public void mainMenu() {
-        while (running) {
-            personas.add(new ArrayList<>());
-            personas.add(new ArrayList<>());
-            personas.add(new ArrayList<>());
+        personas.add(new ArrayList<>());
+        personas.add(new ArrayList<>());
+        personas.add(new ArrayList<>());
 
-            // TODO: Add visuals for a good menu
+        menuTablas.add("Tablas:");
+        menuTablas.add("1) Cliente");
+        menuTablas.add("2) Empleado");
+        menuTablas.add("3) Proveedor");
+
+        menuModificacionTablas.add("Opciones:");
+        menuModificacionTablas.add("1) Mostrar registros");
+        menuModificacionTablas.add("2) Ingresar registro");
+        menuModificacionTablas.add("3) Editar registro");
+        menuModificacionTablas.add("4) Borrar registro");
+        menuModificacionTablas.add("5) Volver atrás");
+
+        menuModificacionRegistro.add("Campos:");
+        menuModificacionRegistro.add("1) Nombre");
+        menuModificacionRegistro.add("2) Apellidos");
+        menuModificacionRegistro.add("3) Dirección");
+        menuModificacionRegistro.add("4) Email");
+        menuModificacionRegistro.add("5) Teléfono");
+        menuModificacionRegistro.add("6) Observaciones");
+        menuModificacionRegistro.add("7) Guardar y volver atrás");
+        menuModificacionRegistro.add("8) Cancelar y volver atrás");
+
+        while (running) {
             // TODO: Change so it opens a window to select the file to load instead
             File f;
             do {
@@ -236,8 +298,8 @@ public class MainProgram {
 
             if (confirmarSeleccion("¿Desea guardar los cambios realizados? (S/N): ")) {
                 if (rutaCargada.isEmpty() || confirmarSeleccion("¿Desea guardar la base de datos en un archivo nuevo? (S/N): ")) {
-            // Se creó una nueva Agenda, pedir la ruta completa dónde guardar el archivo (nombre y extensión incluidos)
-                f = pedirRuta("Ingrese la ruta donde guardar la información: ", false, false);
+                    // Se creó una nueva Agenda, pedir la ruta completa dónde guardar el archivo (nombre y extensión incluidos)
+                    f = pedirRuta("Ingrese la ruta donde guardar la información: ", false, false);
                 }
     
                 try {
@@ -261,16 +323,13 @@ public class MainProgram {
     }
 
     public void menuTablas() {
-        System.out.println("Tablas:");
-        System.out.println("1) Cliente");
-        System.out.println("2) Empleado");
-        System.out.println("3) Proveedor");
-        System.out.println("4) Volver atrás");
-        while (opcion < 1 || opcion > 4) {
-            opcion = pedirInt("¿Qué tabla desea modificar? (1-4): ");
+        mostrarMenu(menuTablas);
+        
+        while (opcion < 0 || opcion > personas.size()) {
+            opcion = pedirInt("¿Qué tabla desea modificar? (0 para cancelar): ");
         }
 
-        if (opcion == 4) {
+        if (opcion == 0) {
             seleccionandoTabla = false;
             running = false;
         } else {
@@ -290,12 +349,8 @@ public class MainProgram {
      * ********************************
      */
     public void menuModificacionTabla() {
-        System.out.println("Opciones:");
-        System.out.println("1) Mostrar registros");
-        System.out.println("2) Ingresar registro");
-        System.out.println("3) Editar registro");
-        System.out.println("4) Borrar registro");
-        System.out.println("5) Volver atrás");
+        mostrarMenu(menuModificacionTablas);
+
         opcion = pedirInt("¿Qué desea hacer? (1-5): ");
 
         switch (opcion) {
@@ -373,7 +428,7 @@ public class MainProgram {
 
     public void menuModificacionRegistro() {
         if (personas.get(tablaElegida).isEmpty()) {
-            System.out.println("No existe ningún registro.");
+            System.out.println("No hay ningún registro.");
             return;
         }
 
@@ -400,16 +455,9 @@ public class MainProgram {
         observaciones = personaElegida.getObservaciones();
 
         while (!done) {
-            System.out.println("Campos:");
-            System.out.println("1) Nombre");
-            System.out.println("2) Apellidos");
-            System.out.println("3) Dirección");
-            System.out.println("4) Email");
-            System.out.println("5) Teléfono");
-            System.out.println("6) Observaciones");
-            System.out.println("7) Guardar y volver atrás");
-            System.out.println("8) Cancelar y volver atrás");
-            opcion = pedirInt("¿Qué campo desea modificar? (1-7): ");
+            mostrarMenu(menuModificacionRegistro);
+
+            opcion = pedirInt("¿Qué campo desea modificar? ");
 
             switch (opcion) {
                 case 1 -> {
@@ -452,9 +500,9 @@ public class MainProgram {
                     if (camposEditados != 0) {
                         String mensajeConfirmacion = "¿Está seguro que desea sobreescribir los campos editados? (S/N): ";
 
-                        String s = getStringCamposEditados(personaElegida, camposEditados);
-
-                        if (confirmarSeleccion(s + mensajeConfirmacion)) {
+                        mostrarMenu(getMenuCamposEditados(personaElegida, camposEditados));
+                        
+                        if (confirmarSeleccion(mensajeConfirmacion)) {
                             personaElegida.setNombre(nombre);
                             personaElegida.setApellidos(apellidos);
                             personaElegida.setDireccion(direccion);
@@ -472,9 +520,9 @@ public class MainProgram {
                     if (camposEditados != 0) {
                         String mensajeConfirmacion = "¿Está seguro que desea descartar los cambios realizados? (S/N): ";
 
-                        String s = getStringCamposEditados(personaElegida, camposEditados);
+                        mostrarMenu(getMenuCamposEditados(personaElegida, camposEditados));
 
-                        if (confirmarSeleccion(s + mensajeConfirmacion)) {
+                        if (confirmarSeleccion(mensajeConfirmacion)) {
                             done = true;
                         }
                     }
