@@ -360,8 +360,8 @@ public class MainProgram {
                     break;
                 }
 
-                for (Persona persona : personas.get(tablaElegida)) {
-                    System.out.println("1) " + persona.obtenerInformacion());
+                for (int i = 0; i < personas.get(tablaElegida).size(); i++) {
+                    System.out.println((i + 1) + ") " + personas.get(tablaElegida).get(i).obtenerInformacion());
                 }
             }
             case 2 -> {
@@ -431,22 +431,30 @@ public class MainProgram {
             System.out.println("No hay ningún registro.");
             return;
         }
+        
+        ArrayList<Persona> referenciaATablaElegida = personas.get(tablaElegida);
 
         System.out.println("Registros:");
-        for (Persona persona : personas.get(tablaElegida)) {
-            System.out.println("1) " + persona.obtenerInformacion());
+        for (int i = 0; i < referenciaATablaElegida.size(); i++) {
+            System.out.println((i + 1) + ") " + referenciaATablaElegida.get(i).obtenerInformacion());
         }
 
-        registroElegido = switch (personas.get(tablaElegida).size()) {
-            case 1 ->
+        do {
+            registroElegido = switch (referenciaATablaElegida.size()) {
+                case 1 ->
                 0;
-            default ->
-                pedirInt("Selecciona el registro a modificar (1-" + personas.get(tablaElegida).size() + "): ") - 1;
-        };
+                default ->
+                pedirInt("Selecciona el registro a modificar (1-" + referenciaATablaElegida.size() + "): ") - 1;
+            };
+            if (registroElegido < 0 || registroElegido >= referenciaATablaElegida.size()) {
+                System.out.println("ERROR: No se ingresó un registro válido.");
+            }
+        } while (registroElegido < 0 || registroElegido >= referenciaATablaElegida.size());
+
         boolean done = false;
         byte camposEditados = 0;
 
-        Persona personaElegida = personas.get(tablaElegida).get(registroElegido);
+        Persona personaElegida = referenciaATablaElegida.get(registroElegido);
         nombre = personaElegida.getNombre();
         apellidos = personaElegida.getApellidos();
         direccion = personaElegida.getDireccion();
@@ -479,6 +487,7 @@ public class MainProgram {
                     }
                 }
                 case 4 -> {
+                    // TODO: Add a match clause to make sure the String being added is an email
                     email = pedirString("Correo electrónico: ", false);
                     if (!email.equals(personaElegida.getEmail())) {
                         camposEditados |= (1 << 3);

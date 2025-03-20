@@ -1,0 +1,8 @@
+5
+CLIENTE
+1,Alberto,Gomez Lopez,Calle Flores 12,a.gomezlopes@gmail.com,698524587,
+EMPLEADO
+3,Maria,Gutierrez,Calle Ramos 52,m.gutierrez@gmail.com,632569875,
+4,Belen,Mendez Ortega,Calle Ramos 123,b.mendezortega@gmail.com,654265685,
+PROVEEDOR
+2,Ricardo,Murcia Garcia,Calle Flores 255,r.murciagarcia@gmail.com,647589856,Pedir 10 vacunas antes del 10 de mayo
